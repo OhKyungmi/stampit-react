@@ -18,11 +18,12 @@ body {
   box-sizing: border-box;
 }
 
-/* 갤럭시 등 Android: 100dvh 기준으로 레이아웃 고정 */
+/* 갤럭시 등 Android: 키보드 올라와도 레이아웃 불변 */
+/* interactive-widget=resizes-visual 와 함께 사용:
+   키보드가 layout viewport를 건드리지 않으므로 dvh/svh 모두 안정적 */
 html, body, #root {
   height: 100%;
-  /* dvh fallback: 브라우저 미지원 시 100% 사용 */
-  height: 100dvh;
+  height: 100dvh;  /* dynamic viewport — interactive-widget=resizes-visual 설정 시 키보드에도 불변 */
   overflow-x: hidden;
 }
 

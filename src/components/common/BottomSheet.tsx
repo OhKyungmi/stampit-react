@@ -66,8 +66,10 @@ export default function BottomSheet({
     }
 
     vv.addEventListener('resize', onResize);
+    vv.addEventListener('scroll', onResize); // Android 일부 버전에서 scroll 이벤트로 감지
     return () => {
       vv.removeEventListener('resize', onResize);
+      vv.removeEventListener('scroll', onResize);
       setKeyboardOffset(0);
     };
   }, [isOpen]);

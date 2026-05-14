@@ -66,8 +66,10 @@ export default function ConfirmScheduleSheet({
       setKeyboardOffset(offset);
     }
     vv.addEventListener('resize', onResize);
+    vv.addEventListener('scroll', onResize);
     return () => {
       vv.removeEventListener('resize', onResize);
+      vv.removeEventListener('scroll', onResize);
       setKeyboardOffset(0);
     };
   }, [isOpen]);
