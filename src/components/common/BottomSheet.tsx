@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 /**
  * 스탬핏 BottomSheet 컴포넌트
@@ -36,6 +36,9 @@ export default function BottomSheet({
   maxHeight = '90vh',
   testId,
 }: BottomSheetProps) {
+  // 키보드 올라올 때 시트 위로 밀어올리는 오프셋
+  const [keyboardOffset, setKeyboardOffset] = useState(0);
+
   // 열릴 때 body 스크롤 잠금
   useEffect(() => {
     if (isOpen) {
@@ -45,6 +48,43 @@ export default function BottomSheet({
     }
     return () => { document.body.style.overflow = ''; };
   }, [isOpen]);
+
+  // ── visualViewport 기반 키보드 감지 ──────────────────────────────────
+  // iOS Safari: 키보드 올라와도 layout viewport 불변 → fixed 요소가 키보드에 가려짐
+  // visualViewport.height 가 줄어든 만큼 시트를 위로 올려 입력창 노출
+  useEffect(() => {
+    if (!isOpen) return;
+    const vv = window.visualViewport;
+    if (!vv) return;
+
+    function onResize() {
+      const offset = Math.max(
+        0,
+        window.innerHeight - vv!.height - vv!.offsetTop,
+      );
+      setKeyboardOffset(offset);
+    }
+
+    vv.addEventListener('resize', onResize);
+    return () => {
+      vv.removeEventListener('resize', onResize);
+      setKeyboardOffset(0);
+    };
+  }, [isOpen]);
+
+  // ── 입력창 포커스 시 스크롤해서 키보드 위로 노출 ─────────────────────
+  function handleScrollAreaFocus(e: React.FocusEvent<HTMLDivElement>) {
+    const target = e.target;
+    if (
+      !(target instanceof HTMLInputElement) &&
+      !(target instanceof HTMLTextAreaElement) &&
+      !(target instanceof HTMLSelectElement)
+    ) return;
+    // 키보드가 완전히 올라온 뒤(~300ms) 스크롤
+    setTimeout(() => {
+      target.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 300);
+  }
 
   if (!isOpen) return null;
 
@@ -57,11 +97,15 @@ export default function BottomSheet({
         data-testid="bottom-sheet-backdrop"
       />
 
-      {/* 시트 */}
+      {/* 시트 — keyboardOffset 만큼 bottom 을 올림 */}
       <div
         data-testid={testId}
-        className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-[24px] flex flex-col"
-        style={{ maxHeight }}
+        className="fixed left-0 right-0 z-50 bg-white rounded-t-[24px] flex flex-col"
+        style={{
+          maxHeight,
+          bottom: keyboardOffset,
+          transition: keyboardOffset > 0 ? 'bottom 0.15s ease-out' : 'none',
+        }}
       >
         {/* 핸들 */}
         <div className="flex justify-center pt-3 pb-1 flex-shrink-0">
@@ -90,7 +134,10 @@ export default function BottomSheet({
         </div>
 
         {/* 콘텐츠 (스크롤) */}
-        <div className="flex-1 overflow-y-auto overscroll-contain px-5 py-4">
+        <div
+          className="flex-1 overflow-y-auto overscroll-contain px-5 py-4"
+          onFocus={handleScrollAreaFocus}
+        >
           {children}
         </div>
 

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import type { Schedule, Show, BoardAllocation } from '../../types';
 import { formatKSTDate } from '../../utils/dateUtils';
 import { formatMoney } from '../../utils/priceCalc';
@@ -54,6 +54,35 @@ export default function ConfirmScheduleSheet({
   );
   const [showSummary,    setShowSummary]    = useState(false);
   const [showMultiplier, setShowMultiplier] = useState(false);
+  const [keyboardOffset, setKeyboardOffset] = useState(0);
+
+  // ── visualViewport 키보드 감지 ─────────────────────────────────────────
+  useEffect(() => {
+    if (!isOpen) return;
+    const vv = window.visualViewport;
+    if (!vv) return;
+    function onResize() {
+      const offset = Math.max(0, window.innerHeight - vv!.height - vv!.offsetTop);
+      setKeyboardOffset(offset);
+    }
+    vv.addEventListener('resize', onResize);
+    return () => {
+      vv.removeEventListener('resize', onResize);
+      setKeyboardOffset(0);
+    };
+  }, [isOpen]);
+
+  // ── 입력창 포커스 → 키보드 위로 스크롤 ───────────────────────────────────
+  function handleScrollAreaFocus(e: React.FocusEvent<HTMLDivElement>) {
+    const target = e.target;
+    if (
+      !(target instanceof HTMLInputElement) &&
+      !(target instanceof HTMLTextAreaElement)
+    ) return;
+    setTimeout(() => {
+      target.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 300);
+  }
 
   // ── 확정 가능 여부 ─────────────────────────────────────────────────────
   const checklistDone = useMemo(() => {
@@ -84,11 +113,15 @@ export default function ConfirmScheduleSheet({
         onClick={onClose}
       />
 
-      {/* 시트 */}
+      {/* 시트 — keyboardOffset 만큼 bottom 을 올림 */}
       <div
         data-testid="bottomsheet-confirm"
-        className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-[24px] flex flex-col max-h-[92vh]"
-        style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+        className="fixed left-0 right-0 z-50 bg-white rounded-t-[24px] flex flex-col max-h-[92vh]"
+        style={{
+          bottom: keyboardOffset,
+          paddingBottom: keyboardOffset === 0 ? 'env(safe-area-inset-bottom, 0px)' : 0,
+          transition: keyboardOffset > 0 ? 'bottom 0.15s ease-out' : 'none',
+        }}
       >
         {/* 핸들 */}
         <div className="flex justify-center pt-3 flex-shrink-0">
@@ -111,7 +144,10 @@ export default function ConfirmScheduleSheet({
         </div>
 
         {/* ── 스크롤 영역 ───────────────────────────────────────────────── */}
-        <div className="flex-1 overflow-y-auto overscroll-contain px-5 pb-4 space-y-4">
+        <div
+          className="flex-1 overflow-y-auto overscroll-contain px-5 pb-4 space-y-4"
+          onFocus={handleScrollAreaFocus}
+        >
 
           {/* ① 체크리스트 — 최상단 */}
           {(discount?.isRebook || discount?.isCoupon) && (
