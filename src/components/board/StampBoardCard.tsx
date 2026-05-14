@@ -51,19 +51,19 @@ export default function StampBoardCard({
             <>
               <button
                 onClick={() => { onAddStamp!(board.id, 'exchange'); setSwiped(false); }}
-                className="px-2 py-2 bg-blue-400 text-white rounded-xl text-xs font-medium min-h-[44px] whitespace-nowrap"
+                className="px-2 py-2 bg-gray-500 text-white rounded-xl text-xs font-medium min-h-[44px] whitespace-nowrap"
               >
                 +교환
               </button>
               <button
                 onClick={() => { onAddStamp!(board.id, 'share'); setSwiped(false); }}
-                className="px-2 py-2 bg-green-400 text-white rounded-xl text-xs font-medium min-h-[44px] whitespace-nowrap"
+                className="px-2 py-2 bg-gray-500 text-white rounded-xl text-xs font-medium min-h-[44px] whitespace-nowrap"
               >
                 +나눔
               </button>
               <button
                 onClick={() => { onAddStamp!(board.id, 'etc'); setSwiped(false); }}
-                className="px-2 py-2 bg-gray-400 text-white rounded-xl text-xs font-medium min-h-[44px] whitespace-nowrap"
+                className="px-2 py-2 bg-gray-500 text-white rounded-xl text-xs font-medium min-h-[44px] whitespace-nowrap"
               >
                 +기타
               </button>
@@ -71,7 +71,7 @@ export default function StampBoardCard({
           )}
           <button
             onClick={() => { onEdit(board.id); setSwiped(false); }}
-            className="px-3 py-2 bg-blue-500 text-white rounded-xl text-sm font-medium min-h-[44px]"
+            className="px-3 py-2 bg-indigo-500 text-white rounded-xl text-sm font-medium min-h-[44px]"
           >
             수정
           </button>
@@ -104,9 +104,9 @@ export default function StampBoardCard({
           </div>
         ) : (
           // 진행 중인 판
-          <div className="bg-white border border-gray-100 p-4 rounded-2xl shadow-sm">
+          <div className="bg-white border border-gray-100 px-4 pt-2 pb-4 rounded-2xl shadow-sm">
             {/* 헤더 */}
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2 flex-wrap">
                 <h3 className="font-bold text-gray-900">{board.name}</h3>
                 <Badge color="primary">{priority}순위</Badge>

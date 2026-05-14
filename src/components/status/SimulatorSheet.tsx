@@ -185,37 +185,38 @@ export default function SimulatorSheet({ isOpen, onClose, boards, schedules = []
             </div>
 
             {/* ── 모든 혜택 받기 토글 ── */}
-            <div className="flex items-center justify-between gap-3">
+            {/* leftoverViews=0이면 신규 판 없음 → 토글 비활성 */}
+            <div className={`flex items-center justify-between gap-3 ${leftoverViews === 0 ? 'opacity-40 pointer-events-none' : ''}`}>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-700">모든 혜택 받기</p>
                 <p className="text-xs text-gray-400 mt-0.5">
-                  {allBenefits
-                    ? '모든 혜택을 1개씩 받은 뒤 나머지를 우선순위대로 배분해요'
-                    : '1순위 혜택을 최대한 많이 받도록 배분해요'}
+                  {leftoverViews === 0
+                    ? '기존 판이 모든 관람을 소화해요'
+                    : allBenefits
+                      ? '모든 혜택을 1개씩 받은 뒤 나머지를 우선순위대로 배분해요'
+                      : '1순위 혜택을 최대한 많이 받도록 배분해요'}
                 </p>
               </div>
               <button
                 onClick={() => setAllBenefits(v => !v)}
                 className={`relative w-12 h-6 rounded-full transition-colors shrink-0 ${
-                  allBenefits ? 'bg-indigo-500' : 'bg-gray-200'
+                  allBenefits && leftoverViews > 0 ? 'bg-indigo-500' : 'bg-gray-200'
                 }`}
               >
                 <span
                   className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
-                    allBenefits ? 'translate-x-6' : 'translate-x-0.5'
+                    allBenefits && leftoverViews > 0 ? 'translate-x-6' : 'translate-x-0.5'
                   }`}
                 />
               </button>
             </div>
 
-            {/* allBenefits ON인데 횟수 부족 */}
-            {allBenefits && !canGuaranteeAll && (
+            {/* allBenefits ON + 잔여 있지만 최소 횟수 부족 */}
+            {allBenefits && leftoverViews > 0 && !canGuaranteeAll && (
               <div className="px-4 py-3 bg-amber-50 border border-amber-200 rounded-2xl">
                 <p className="text-xs text-amber-700">
-                  신규 도장판에 쓸 수 있는 잔여 횟수가{' '}
-                  <span className="font-bold">{leftoverViews}회</span>예요.
-                  모든 혜택을 받으려면 최소{' '}
-                  <span className="font-bold">{maxThreshold}회</span>가 필요해서
+                  잔여 <span className="font-bold">{leftoverViews}회</span>로는 모든 혜택을 보장하기 어려워요.{' '}
+                  최소 <span className="font-bold">{maxThreshold}회</span>가 필요해서
                   우선순위 기준으로 배분해드릴게요.
                 </p>
               </div>

@@ -66,7 +66,7 @@ export default function StatusSummaryCard({
             data-testid={cell.testid}
             onClick={cell.onClick}
             disabled={!cell.onClick}
-            className={`bg-white px-[14px] py-[16px] text-left ${
+            className={`bg-white px-[14px] pt-[14px] pb-[16px] text-left ${
               cell.onClick ? 'active:bg-gray-50 cursor-pointer' : 'cursor-default'
             }`}
           >

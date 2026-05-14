@@ -56,7 +56,7 @@ export default function FocusCard({ boards, onScrollToBoard, onAddBoard }: Focus
             <p className="text-sm font-bold text-white leading-snug">
               💡{' '}
               <span className="font-semibold opacity-90">{info.boardName}</span>에{' '}
-              <span className="text-amber-300 font-extrabold">{info.remainingStamps}개</span>만 더 찍으면
+              <span className="text-white font-extrabold underline decoration-dotted underline-offset-2">{info.remainingStamps}개</span>만 더 찍으면
             </p>
             <p className="text-sm text-indigo-200 mt-0.5 font-medium">
               {info.benefitDescription}이에요

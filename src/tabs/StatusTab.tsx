@@ -51,8 +51,8 @@ export default function StatusTab({ show, onGoToPlanner }: StatusTabProps) {
   const [couponHistoryOpen, setCouponHistoryOpen] = useState(false);
   const [showAmount, setShowAmount] = useState(false); // 기본: 블러(숨김)
 
-  const boardSectionRef = useRef<HTMLDivElement>(null);
-  const benefitSectionRef = useRef<HTMLDivElement>(null);
+  const boardSectionRef = useRef<HTMLElement>(null);
+  const benefitSectionRef = useRef<HTMLElement>(null);
 
   const editingBoard = editingBoardId
     ? show.stampBoards.find(b => b.id === editingBoardId) ?? null
@@ -165,7 +165,6 @@ export default function StatusTab({ show, onGoToPlanner }: StatusTabProps) {
         />
 
         {/* 도장판 */}
-        <div ref={boardSectionRef} />
         {(() => {
           // 숨겨진 판은 현황 탭 목록에서 제외
           const sortedBoards = [...show.stampBoards].filter(b => !b.isHidden).sort((a, b) => a.sortOrder - b.sortOrder);
@@ -207,7 +206,7 @@ export default function StatusTab({ show, onGoToPlanner }: StatusTabProps) {
           }
 
           return (
-            <section className="space-y-3">
+            <section ref={boardSectionRef} className="space-y-3">
               <SectionHeader
                 title="도장판"
                 className="-mx-4"
@@ -287,8 +286,7 @@ export default function StatusTab({ show, onGoToPlanner }: StatusTabProps) {
         })()}
 
         {/* 혜택 현황 */}
-        <div ref={benefitSectionRef} />
-        <section className="space-y-2">
+        <section ref={benefitSectionRef} className="space-y-2">
           <SectionHeader title="혜택 현황" className="-mx-4" />
           <CouponTrackerCard boards={show.stampBoards} onTap={() => setCouponHistoryOpen(true)} showAmount={true} />
           <RewardSummary showId={show.id} boards={show.stampBoards} />
