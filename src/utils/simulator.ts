@@ -1,5 +1,19 @@
 import type { StampBoard, SimulatorResult, SimulatorBoardResult } from '../types';
 
+/** 신규 도장판 추가 시 혜택 달성 플랜 */
+export interface NewBoardPlan {
+  targetThreshold: number;   // 판 목표 도장 수 (= 해당 혜택까지 채울 기준)
+  newBoardsCount: number;    // floor(leftoverViews / targetThreshold)
+  benefitsPerBoard: {
+    description: string;
+    requiredStamps: number;
+    priority: number;
+  }[];
+  totalNewBenefits: number;  // newBoardsCount × benefitsPerBoard.length
+  leftoverAfter: number;     // leftoverViews % targetThreshold
+  isRecommended: boolean;    // 1순위 혜택을 가장 많이 달성하는 플랜
+}
+
 /** 깊은 복사 */
 function cloneBoards(boards: StampBoard[]): StampBoard[] {
   return JSON.parse(JSON.stringify(boards));
@@ -108,4 +122,165 @@ export function runSimulator(
   const leftoverViews = remainingViews - usedViews;
 
   return { totalBenefits, boardResults, leftoverViews };
+}
+
+/**
+ * 신규 도장판 추가 시 혜택 달성 플랜 목록 생성 (순수 함수)
+ *
+ * 템플릿 도장판의 각 혜택 기준점(requiredStamps)을 도장판 목표 용량으로 삼아,
+ * leftoverViews 회수로 몇 개 판을 완성할 수 있는지 계산한다.
+ * 1순위(최저 priority 값) 혜택을 가장 많이 달성하는 플랜을 isRecommended=true 로 표시.
+ */
+export function planNewBoards(
+  templateBoard: StampBoard,
+  leftoverViews: number,
+): NewBoardPlan[] {
+  if (leftoverViews <= 0 || templateBoard.benefits.length === 0) return [];
+
+  // 혜택 기준점 목록 (중복 제거 → 오름차순)
+  const thresholds = [
+    ...new Set(templateBoard.benefits.map(b => b.requiredStamps)),
+  ].sort((a, b) => a - b);
+
+  const plans: NewBoardPlan[] = thresholds
+    .map(threshold => {
+      const newBoardsCount = Math.floor(leftoverViews / threshold);
+      if (newBoardsCount === 0) return null;
+
+      const leftoverAfter = leftoverViews % threshold;
+      // 해당 threshold 이하의 모든 혜택 → 우선순위 → 필요 도장 수 순
+      const benefitsPerBoard = templateBoard.benefits
+        .filter(b => b.requiredStamps <= threshold)
+        .sort((a, b) => a.priority - b.priority || a.requiredStamps - b.requiredStamps)
+        .map(b => ({
+          description: b.description,
+          requiredStamps: b.requiredStamps,
+          priority: b.priority,
+        }));
+
+      return {
+        targetThreshold: threshold,
+        newBoardsCount,
+        benefitsPerBoard,
+        totalNewBenefits: newBoardsCount * benefitsPerBoard.length,
+        leftoverAfter,
+        isRecommended: false,
+      };
+    })
+    .filter((p): p is NewBoardPlan => p !== null);
+
+  if (plans.length === 0) return [];
+
+  // 추천 플랜: 최고 우선순위(가장 낮은 priority 값) 혜택 포함 → 그 중 newBoardsCount 최대
+  const topPriority = Math.min(...templateBoard.benefits.map(b => b.priority));
+  const plansWithTop = plans.filter(p =>
+    p.benefitsPerBoard.some(b => b.priority === topPriority),
+  );
+  const recommended = (plansWithTop.length > 0 ? plansWithTop : plans).reduce(
+    (best, cur) => (cur.newBoardsCount > best.newBoardsCount ? cur : best),
+  );
+  recommended.isRecommended = true;
+
+  return plans;
+}
+
+/** 신규 도장판 보장 시나리오 — 특정 혜택 1개 보장 후 나머지 최적 배분 */
+export interface GuaranteedPlanResult {
+  guaranteeThreshold: number;
+  guaranteeBenefitName: string;   // 보장하는 전용 혜택명
+  segments: {
+    threshold: number;
+    count: number;
+    benefitsPerBoard: { description: string; requiredStamps: number; priority: number }[];
+  }[];
+  benefitSummary: { description: string; total: number; priority: number }[];
+  leftoverAfter: number;
+}
+
+/**
+ * 특정 혜택(guaranteeThreshold)을 1개 보장하고 나머지 관람을 우선순위 greedy로 배분.
+ *
+ * 예) leftoverViews=21, guaranteeThreshold=7(대본집)
+ *   → 7회 도장판 1개 확정 후 남은 14회를
+ *     5회(OST,p=1) 2개 + 3회(쿠폰,p=2) 1개 + 잔여 1회 로 배분
+ */
+export function planWithGuarantee(
+  templateBoard: StampBoard,
+  leftoverViews: number,
+  guaranteeThreshold: number,
+): GuaranteedPlanResult | null {
+  if (leftoverViews < guaranteeThreshold) return null;
+
+  const exclusiveBenefit = templateBoard.benefits.find(
+    b => b.requiredStamps === guaranteeThreshold,
+  );
+  if (!exclusiveBenefit) return null;
+
+  // 보장 도장판 1개의 혜택 목록
+  const guaranteeBenefitsPerBoard = templateBoard.benefits
+    .filter(b => b.requiredStamps <= guaranteeThreshold)
+    .sort((a, b) => a.priority - b.priority)
+    .map(b => ({ description: b.description, requiredStamps: b.requiredStamps, priority: b.priority }));
+
+  const segments: GuaranteedPlanResult['segments'] = [
+    { threshold: guaranteeThreshold, count: 1, benefitsPerBoard: guaranteeBenefitsPerBoard },
+  ];
+
+  // 나머지 관람 수를 우선순위 오름차순(낮은 숫자 = 높은 우선) greedy 배분
+  const sortedThresholds = [
+    ...new Set(
+      [...templateBoard.benefits]
+        .sort((a, b) => a.priority - b.priority)
+        .map(b => b.requiredStamps),
+    ),
+  ];
+
+  let remaining = leftoverViews - guaranteeThreshold;
+  for (const threshold of sortedThresholds) {
+    if (remaining <= 0) break;
+    const count = Math.floor(remaining / threshold);
+    if (count === 0) continue;
+
+    const bpb = templateBoard.benefits
+      .filter(b => b.requiredStamps <= threshold)
+      .sort((a, b) => a.priority - b.priority)
+      .map(b => ({ description: b.description, requiredStamps: b.requiredStamps, priority: b.priority }));
+
+    const existingIdx = segments.findIndex(s => s.threshold === threshold);
+    if (existingIdx >= 0) {
+      segments[existingIdx].count += count;
+    } else {
+      segments.push({ threshold, count, benefitsPerBoard: bpb });
+    }
+    remaining %= threshold;
+  }
+
+  // 혜택별 합산
+  const benefitMap = new Map<string, { description: string; total: number; priority: number }>();
+  for (const seg of segments) {
+    for (const b of seg.benefitsPerBoard) {
+      const existing = benefitMap.get(b.description);
+      if (existing) {
+        existing.total += seg.count;
+      } else {
+        benefitMap.set(b.description, {
+          description: b.description,
+          total: seg.count,
+          priority: b.priority,
+        });
+      }
+    }
+  }
+
+  return {
+    guaranteeThreshold,
+    guaranteeBenefitName: exclusiveBenefit.description,
+    segments: segments.sort((a, b) => {
+      const pa = templateBoard.benefits.find(b => b.requiredStamps === a.threshold)?.priority ?? 99;
+      const pb = templateBoard.benefits.find(b => b.requiredStamps === b.threshold)?.priority ?? 99;
+      return pa - pb || b.threshold - a.threshold;
+    }),
+    benefitSummary: [...benefitMap.values()].sort((a, b) => a.priority - b.priority),
+    leftoverAfter: remaining,
+  };
 }
