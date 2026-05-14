@@ -12,7 +12,7 @@ import type {
   BoardAllocation,
   Stamp,
 } from '../types';
-import { nowKST } from '../utils/dateUtils';
+import { nowKST, todayKSTString } from '../utils/dateUtils';
 import { calcFinalPrice } from '../utils/priceCalc';
 import { allocateStamps } from '../utils/stampAllocator';
 import { SPECIAL_EVENT_PRESETS } from '../constants/specialEventPresets';
@@ -25,6 +25,21 @@ function genId(): string {
 /** KST 현재 시각을 ISO 문자열로 반환 */
 function nowISO(): string {
   return nowKST().toISOString();
+}
+
+/**
+ * 혜택 달성 계산용 유효 도장 수
+ * - 초기 도장(isInitial)은 항상 카운트
+ * - 확정 도장은 earnedAt(YYYY-MM-DD) 이 today 이하인 경우만 카운트
+ * - earnedAt이 없거나 비어있으면 항상 카운트 (수동 도장 등)
+ */
+function effectiveStampCount(stamps: Stamp[], today: string): number {
+  return stamps.filter(s => {
+    if (s.isInitial) return true;
+    if (!s.earnedAt) return true;
+    // earnedAt이 YYYY-MM-DD 또는 ISO timestamp 형식 모두 slice(0,10)으로 날짜 비교
+    return s.earnedAt.slice(0, 10) <= today;
+  }).length;
 }
 
 interface ShowStore {
@@ -119,6 +134,12 @@ interface ShowStore {
 
   // 공연 탭 순서 변경 (4.16)
   reorderShows: (orderedIds: string[]) => void;
+
+  /**
+   * 날짜 기반 혜택 달성 재계산 (앱 시작 시 호출)
+   * 확정 도장의 earnedAt(YYYY-MM-DD)이 오늘 이전인 경우만 혜택 달성으로 인정
+   */
+  refreshBenefits: () => void;
 }
 
 interface StorageData {
@@ -788,6 +809,10 @@ export const useShowStore = create<ShowStore>((set, get) => {
             : s
         );
         // 각 보드에 확정 도장 추가 및 혜택 달성 체크
+        const today = todayKSTString();
+        // 미래 일정이면 혜택 달성 불가 (날짜가 당도해야 혜택 발생)
+        const dateHasPassed = schedule.date <= today;
+
         const shows = state.shows.map(show => {
           if (show.id !== schedule.showId) return show;
           const boards = show.stampBoards.map(board => {
@@ -800,15 +825,16 @@ export const useShowStore = create<ShowStore>((set, get) => {
                 scheduleId,
                 isInitial: false,
                 isConfirmed: true,
-                earnedAt: nowISO(),
+                // 관람 날짜를 earnedAt으로 사용 (확정 시각이 아닌 실제 관람일)
+                earnedAt: schedule.date,
                 stampType: 'visit' as const,
               });
             }
             const updatedStamps = [...board.stamps, ...newStamps];
-            const newCount = updatedStamps.length;
-            // 혜택 달성 여부 체크
+            // 혜택 달성은 날짜가 지난 도장 수 기준으로 체크
+            const effectiveCount = effectiveStampCount(updatedStamps, today);
             const updatedBenefits = board.benefits.map(b => {
-              if (!b.isAchieved && b.requiredStamps <= newCount) {
+              if (!b.isAchieved && dateHasPassed && b.requiredStamps <= effectiveCount) {
                 return { ...b, isAchieved: true };
               }
               return b;
@@ -817,7 +843,7 @@ export const useShowStore = create<ShowStore>((set, get) => {
               ...board,
               stamps: updatedStamps,
               benefits: updatedBenefits,
-              isCompleted: newCount >= board.capacity,
+              isCompleted: updatedStamps.length >= board.capacity,
             };
           });
           return { ...show, stampBoards: boards };
@@ -1212,6 +1238,28 @@ export const useShowStore = create<ShowStore>((set, get) => {
           const idx = orderedIds.indexOf(show.id);
           return idx !== -1 ? { ...show, tabOrder: idx } : show;
         });
+        saveData(shows, state.schedules);
+        return { shows };
+      });
+    },
+
+    refreshBenefits: () => {
+      set(state => {
+        const today = todayKSTString();
+        const shows = state.shows.map(show => ({
+          ...show,
+          stampBoards: show.stampBoards.map(board => {
+            const effective = effectiveStampCount(board.stamps, today);
+            const updatedBenefits = board.benefits.map(b => ({
+              ...b,
+              // 이미 달성된 혜택은 유지, 미달성은 effective count 기준 재평가
+              isAchieved: b.isAchieved
+                ? b.requiredStamps <= effective   // 취소 등으로 도장이 줄었다면 해제 가능
+                : b.requiredStamps <= effective,  // 날짜가 지나 새로 달성
+            }));
+            return { ...board, benefits: updatedBenefits };
+          }),
+        }));
         saveData(shows, state.schedules);
         return { shows };
       });

@@ -14,7 +14,7 @@ type AppState = 'splash' | 'onboarding' | 'main';
 
 /** 메인 앱 컴포넌트 */
 export default function App() {
-  const { shows, addShow, addStampBoard, archiveShow, dismissArchivePrompt } = useShowStore();
+  const { shows, addShow, addStampBoard, archiveShow, dismissArchivePrompt, refreshBenefits } = useShowStore();
   const { settings, setOnboardingDone, setQuickStartDone } = useSettingsStore();
   const { message: errorMessage, clear: clearError } = useErrorToastStore();
 
@@ -146,6 +146,14 @@ export default function App() {
   useEffect(() => {
     if (phase === 'main' && archiveQueue.length === 0) {
       detectExpiredShows();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase]);
+
+  // 앱 시작 시 날짜 기반 혜택 달성 재계산 (미래 확정 일정 날짜가 지났을 때 자동 반영)
+  useEffect(() => {
+    if (phase === 'main') {
+      refreshBenefits();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase]);

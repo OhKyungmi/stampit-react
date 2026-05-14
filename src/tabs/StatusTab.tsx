@@ -280,18 +280,7 @@ export default function StatusTab({ show, onGoToPlanner }: StatusTabProps) {
         {/* 혜택 현황 */}
         <div ref={benefitSectionRef} />
         <section className="space-y-2">
-          <SectionHeader
-            title="혜택 현황"
-            className="-mx-4"
-            action={
-              <button
-                onClick={() => setShowAmount(v => !v)}
-                className="text-xs text-gray-400 font-medium active:text-gray-600"
-              >
-                {showAmount ? '금액 숨기기 👁' : '금액 보기 👁'}
-              </button>
-            }
-          />
+          <SectionHeader title="혜택 현황" className="-mx-4" />
           <CouponTrackerCard boards={show.stampBoards} onTap={() => setCouponHistoryOpen(true)} showAmount={true} />
           <RewardSummary showId={show.id} boards={show.stampBoards} />
         </section>
