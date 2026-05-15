@@ -34,7 +34,7 @@ export default function StampGrid({ capacity, stamps, benefits, previewInitial, 
         const hasBenefit = benefitPositions.has(slotNum);
 
         return (
-          <div key={idx} className="relative aspect-square" data-testid={`stamp-slot-${idx}`}>
+          <div key={idx} className="relative aspect-square" data-testid="stamp-cell" data-slot={`stamp-slot-${idx}`}>
             {isFilled ? (
               /* 찍힌 도장: 원형 */
               <div
@@ -54,7 +54,7 @@ export default function StampGrid({ capacity, stamps, benefits, previewInitial, 
             {hasBenefit && (
               <span
                 className="absolute -top-1 -right-1 text-yellow-400 text-xs leading-none drop-shadow-sm"
-                data-testid={`benefit-marker-${slotNum}`}
+                data-testid="stamp-cell-benefit-star"
               >
                 ★
               </span>

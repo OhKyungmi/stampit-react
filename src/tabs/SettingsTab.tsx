@@ -136,6 +136,7 @@ export default function SettingsTab({ show, onOpenTabOrder }: SettingsTabProps) 
         <StorageBanner />
 
         {/* ── 공연 설정 ─────────────────────────────── */}
+        <div data-testid="settings-section-show">
         <SectionHeader title="공연 설정" />
         <div className="bg-white rounded-2xl overflow-hidden mx-4 shadow-sm">
 
@@ -317,6 +318,8 @@ export default function SettingsTab({ show, onOpenTabOrder }: SettingsTabProps) 
           </div>
         </div>
 
+        </div>{/* /settings-section-show */}
+
         {/* ── 화면 ──────────────────────────────────── */}
         <SectionHeader title="화면" />
         <div className="bg-white rounded-2xl overflow-hidden mx-4 shadow-sm">
@@ -337,7 +340,7 @@ export default function SettingsTab({ show, onOpenTabOrder }: SettingsTabProps) 
 
         {/* ── 순서 ──────────────────────────────────── */}
         {onOpenTabOrder && (
-          <>
+          <div data-testid="tab-order-section">
             <SectionHeader title="순서" />
             <div className="bg-white rounded-2xl overflow-hidden mx-4 shadow-sm">
               <button
@@ -350,7 +353,7 @@ export default function SettingsTab({ show, onOpenTabOrder }: SettingsTabProps) 
                 <ChevronRight />
               </button>
             </div>
-          </>
+          </div>
         )}
 
         {/* ── 데이터 ────────────────────────────────── */}
@@ -391,6 +394,7 @@ export default function SettingsTab({ show, onOpenTabOrder }: SettingsTabProps) 
                 return (
                   <button
                     key={s.id}
+                    data-testid={`btn-view-report-${s.id}`}
                     onClick={() => setReportShow(s)}
                     className={`w-full flex items-center justify-between px-4 py-3.5 text-left active:bg-gray-50 ${
                       i < archivedShows.length - 1 ? 'border-b border-gray-100' : ''

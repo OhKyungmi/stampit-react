@@ -466,7 +466,7 @@ export default function PlannerTab({ show, onGoToSettings, onGoToStatus }: Plann
         )}
 
         {showSchedules.length === 0 && (
-          <div className="text-center py-12 text-gray-400">
+          <div data-testid="empty-schedule-state" className="text-center py-12 text-gray-400">
             <p className="text-4xl mb-3">📅</p>
             <p className="text-sm">아직 관람 일정이 없어요</p>
             <p className="text-xs mt-1">+ 버튼으로 일정을 추가해보세요</p>

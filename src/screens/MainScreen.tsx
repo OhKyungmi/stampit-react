@@ -52,7 +52,7 @@ export default function MainScreen({ shows }: MainScreenProps) {
   return (
     <div data-testid="main" className="flex flex-col h-dvh bg-gray-50">
       {/* 상단 헤더 */}
-      <div className="sticky top-0 z-20 bg-white shadow-sm">
+      <header data-testid="app-header" className="sticky top-0 z-20 bg-white shadow-sm">
         <ShowTabBar
           shows={shows}
           activeShowId={activeShowId}
@@ -69,7 +69,7 @@ export default function MainScreen({ shows }: MainScreenProps) {
           }}
           onOpenTabOrder={() => setTabOrderOpen(true)}
         />
-      </div>
+      </header>
 
       {/* 탭 내용 */}
       <div className="flex-1 overflow-hidden flex flex-col">

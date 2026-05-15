@@ -20,7 +20,7 @@ export default function ArchivePromptSheet({
 
   return (
     /* 오버레이 */
-    <div data-testid="archive-prompt-sheet" className="fixed inset-0 z-50 flex items-end">
+    <div data-testid="archive-prompt" className="fixed inset-0 z-50 flex items-end">
       <div className="absolute inset-0 bg-black/40" />
 
       {/* 시트 */}
@@ -65,14 +65,14 @@ export default function ArchivePromptSheet({
 
           <div className="flex gap-3">
             <button
-              data-testid="btn-archive-dismiss"
+              data-testid="btn-later"
               onClick={() => onDismiss(show.id)}
               className="py-3 px-5 rounded-2xl bg-gray-100 text-gray-600 text-sm font-medium active:bg-gray-200 shrink-0"
             >
               나중에
             </button>
             <button
-              data-testid="btn-archive-confirm"
+              data-testid="btn-archive-and-report"
               onClick={() => onArchive(show.id)}
               className="flex-1 py-3 rounded-2xl bg-indigo-600 text-white text-sm font-semibold active:bg-indigo-800"
             >

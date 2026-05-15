@@ -47,7 +47,7 @@ export default function QuickConfirmCard({
     return (
       <div
         className="bg-gray-50 border border-dashed border-gray-200 rounded-xl px-4 py-4 text-center"
-        data-testid="quick-confirm-empty"
+        data-testid="no-today-schedule"
       >
         <p className="text-2xl mb-1.5">🎭</p>
         <p className="text-sm text-gray-400 font-medium">오늘 예정된 관람이 없어요</p>
@@ -153,7 +153,7 @@ export default function QuickConfirmCard({
 
         {/* 하단: 확정하기 버튼 (전체 너비, 48px) */}
         <button
-          data-testid="quick-confirm-btn"
+          data-testid={needsChecklist ? 'btn-confirm' : 'btn-instant-confirm'}
           onClick={() => needsChecklist ? onConfirm(schedule.id) : onQuickConfirm(schedule.id)}
           className="w-full py-3 bg-indigo-600 text-white rounded-xl text-sm font-bold min-h-[48px] active:bg-indigo-800 transition-colors"
         >

@@ -37,7 +37,7 @@ export default function StatusSummaryCard({
       unit: '개',
       color: colors.gray[900],
       onClick: undefined as (() => void) | undefined,
-      testid: undefined,
+      testid: 'stat-confirmed',
     },
     {
       label: '다음 혜택까지',
@@ -45,7 +45,7 @@ export default function StatusSummaryCard({
       unit: nextBenefitStamps != null ? '개' : undefined,
       color: colors.primary[600],
       onClick: onTapBoards,
-      testid: undefined,
+      testid: 'stat-next-benefit',
     },
     {
       label: '미사용 혜택',
@@ -53,7 +53,7 @@ export default function StatusSummaryCard({
       unit: '개',
       color: unusedBenefits > 0 ? colors.accent[500] : colors.gray[300],
       onClick: onTapBenefits,
-      testid: undefined,
+      testid: 'stat-unused-benefits',
     },
   ];
 

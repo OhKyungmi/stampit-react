@@ -138,7 +138,7 @@ export default function ConfirmScheduleSheet({
 
       {/* 시트 — keyboardOffset 만큼 bottom 을 올림 */}
       <div
-        data-testid="bottomsheet-confirm"
+        data-testid="confirm-sheet"
         className="fixed left-0 right-0 z-50 bg-white rounded-t-[24px] flex flex-col max-h-[92vh]"
         style={{
           bottom: keyboardOffset,
@@ -174,7 +174,7 @@ export default function ConfirmScheduleSheet({
 
           {/* ① 체크리스트 — 최상단 */}
           {(discount?.isRebook || discount?.isCoupon) && (
-            <div className="space-y-2">
+            <div data-testid="checklist-section" className="space-y-2">
               <p className="text-[13px] font-semibold text-gray-400 tracking-[0.3px]">확인 사항</p>
 
               {discount.isRebook && (
@@ -242,7 +242,7 @@ export default function ConfirmScheduleSheet({
 
           {/* ② 도장판 — 2개 이상이면 선택 UI, 1개면 간략 표시 */}
           {activeBoards.length > 1 && (
-            <div className="space-y-2">
+            <div data-testid="board-selector" className="space-y-2">
               <p className="text-[13px] font-semibold text-gray-400 tracking-[0.3px]">도장판 선택</p>
               <div className="space-y-2">
                 {activeBoards.map((board, idx) => {
@@ -287,7 +287,7 @@ export default function ConfirmScheduleSheet({
           )}
 
           {activeBoards.length === 1 && (
-            <div className="flex items-center justify-between px-4 py-3 bg-gray-50 rounded-xl">
+            <div data-testid="board-simple-display" className="flex items-center justify-between px-4 py-3 bg-gray-50 rounded-xl">
               <div className="flex items-center gap-2">
                 <div
                   className="w-3 h-3 rounded-full flex-shrink-0"
@@ -371,6 +371,7 @@ export default function ConfirmScheduleSheet({
           {/* ⑤ 관람 요약 — 기본 접힘 */}
           <div className="space-y-2">
             <button
+              data-testid="summary-toggle"
               onClick={() => setShowSummary(v => !v)}
               className="flex items-center justify-between w-full"
             >
@@ -385,7 +386,7 @@ export default function ConfirmScheduleSheet({
             </button>
 
             {showSummary && (
-              <div className="bg-gray-50 rounded-xl overflow-hidden">
+              <div data-testid="summary-section-content" className="bg-gray-50 rounded-xl overflow-hidden">
                 {[
                   { label: '날짜',    value: formatKSTDate(schedule.date) },
                   { label: '좌석',    value: grade?.name ?? '-' },

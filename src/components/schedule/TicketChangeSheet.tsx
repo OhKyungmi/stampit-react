@@ -101,10 +101,10 @@ export default function TicketChangeSheet({
             <p className="text-[11px] font-medium text-indigo-500 mb-2">변경 후</p>
             <p className="text-sm font-semibold text-indigo-700 leading-snug">{newGrade?.name ?? '-'}</p>
             <p className="text-xs text-indigo-400 mt-0.5">{newDiscount?.name ?? '-'}</p>
-            <p className="text-[15px] font-bold text-indigo-700 mt-2">{formatMoney(displayedNewPrice)}</p>
+            <p data-testid="ticket-after-price" className="text-[15px] font-bold text-indigo-700 mt-2">{formatMoney(displayedNewPrice)}</p>
             {/* 차액 — 양수/음수 모두 red (환급 없으므로) */}
             {hasDiff && (
-              <p className="text-[13px] font-semibold mt-0.5" style={{ color: colors.danger[500] }}>
+              <p data-testid="price-diff" className="text-[13px] font-semibold mt-0.5" style={{ color: colors.danger[500] }}>
                 {priceDiff > 0 ? '+' : ''}{formatMoney(priceDiff)}
               </p>
             )}
@@ -115,6 +115,7 @@ export default function TicketChangeSheet({
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">새 좌석 등급</label>
           <select
+            data-testid="select-new-grade"
             value={newGradeId}
             onChange={e => setNewGradeId(e.target.value)}
             className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400"
@@ -129,7 +130,7 @@ export default function TicketChangeSheet({
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">새 할인권종</label>
           <select
-            data-testid="select-discount-change"
+            data-testid="select-new-discount"
             value={newDiscountId}
             onChange={e => setNewDiscountId(e.target.value)}
             className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400"
@@ -142,7 +143,7 @@ export default function TicketChangeSheet({
 
         {/* ── 차액 처리 방식 (diff !== 0 시만) ────────── */}
         {hasDiff && (
-          <div data-testid="price-diff-options" className="space-y-2">
+          <div data-testid="price-diff-method" className="space-y-2">
             <p className="text-[12px] font-semibold text-gray-400 tracking-[0.2px]">차액 처리 방식</p>
 
             {/* 금액 재계산 */}
@@ -197,7 +198,7 @@ export default function TicketChangeSheet({
               />
               <div>
                 <p style={{ fontSize: '14px', fontWeight: 600, color: colors.gray[900] }}>기록만 남기기</p>
-                <p style={{ fontSize: '12px', color: colors.gray[500], marginTop: '2px' }}>
+                <p data-testid="radio-note-only-desc" style={{ fontSize: '12px', color: colors.gray[500], marginTop: '2px' }}>
                   {formatMoney(prevFinalPrice)} 유지, 변경 내용만 메모로 기록해요
                 </p>
               </div>

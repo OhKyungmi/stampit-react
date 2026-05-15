@@ -85,7 +85,7 @@ describe('QuickConfirmCard', () => {
   test('확정하기 버튼 클릭 → onQuickConfirm(scheduleId) 호출 (체크리스트 없음)', () => {
     const onQuickConfirm = vi.fn();
     render(<QuickConfirmCard {...baseProps} onQuickConfirm={onQuickConfirm} />);
-    fireEvent.click(screen.getByTestId('quick-confirm-btn'));
+    fireEvent.click(screen.getByTestId('btn-instant-confirm'));
     expect(onQuickConfirm).toHaveBeenCalledWith('sc1');
   });
 
@@ -93,7 +93,7 @@ describe('QuickConfirmCard', () => {
     const onConfirm = vi.fn();
     const discount = makeDiscount({ isRebook: true });
     render(<QuickConfirmCard {...baseProps} discountTypes={[discount]} onConfirm={onConfirm} />);
-    fireEvent.click(screen.getByTestId('quick-confirm-btn'));
+    fireEvent.click(screen.getByTestId('btn-confirm'));
     expect(onConfirm).toHaveBeenCalledWith('sc1');
   });
 

@@ -247,6 +247,7 @@ export default function SimulatorSheet({ isOpen, onClose, boards, schedules = []
                         .map(r => (
                           <div
                             key={r.boardId}
+                            data-testid={`simulator-result-${r.boardId}`}
                             className="bg-white border border-gray-100 rounded-2xl px-4 py-2.5 shadow-sm"
                           >
                             <div className="flex items-center gap-2">

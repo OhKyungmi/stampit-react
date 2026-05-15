@@ -50,6 +50,7 @@ export default function StampBoardCard({
           {hasStampButtons && (
             <>
               <button
+                data-testid="menu-stamp-exchange"
                 onClick={() => { onAddStamp!(board.id, 'exchange'); setSwiped(false); }}
                 className="px-2 py-2 bg-gray-500 text-white rounded-xl text-xs font-medium min-h-[44px] whitespace-nowrap"
               >

@@ -76,6 +76,8 @@ export default function OnboardingScreen({
         {SLIDES.map((_, idx) => (
           <div
             key={idx}
+            data-testid="slide-indicator"
+            aria-selected={idx === currentSlide ? 'true' : 'false'}
             className={`h-1.5 rounded-full transition-all duration-300 ${
               idx === currentSlide ? 'w-5 bg-indigo-600' : 'w-1.5 bg-gray-300'
             }`}
@@ -92,7 +94,7 @@ export default function OnboardingScreen({
 
         {/* 공연명 입력 */}
         <input
-          data-testid="input-show-name"
+          data-testid="onboarding-input"
           value={showName}
           onChange={e => setShowName(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter') handleInlineSubmit(); }}
@@ -115,6 +117,7 @@ export default function OnboardingScreen({
         {/* 슬라이드 1·2: 다음 버튼 */}
         {!isLastSlide && (
           <button
+            data-testid="btn-next-slide"
             onClick={() => setCurrentSlide(c => c + 1)}
             className="w-full h-14 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white text-base font-semibold rounded-2xl transition-colors"
           >
@@ -124,26 +127,27 @@ export default function OnboardingScreen({
 
         {/* 슬라이드 3: 직접설정하기 + 빠른시작 */}
         {isLastSlide && (
-          <>
+          <div data-testid="slide-2">
             <button
+              data-testid="btn-setup-full"
               onClick={() => onComplete('full')}
               className="w-full h-14 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white text-base font-semibold rounded-2xl transition-colors"
             >
               직접 설정하기
             </button>
             <button
-              data-testid="btn-quick-start"
+              data-testid="btn-setup-quick"
               onClick={() => onComplete('quick')}
-              className="w-full h-14 bg-white border-2 border-indigo-600 text-indigo-600 text-base font-semibold rounded-2xl transition-colors"
+              className="w-full h-14 bg-white border-2 border-indigo-600 text-indigo-600 text-base font-semibold rounded-2xl transition-colors mt-3"
             >
               빠른 시작
             </button>
-          </>
+          </div>
         )}
 
         {/* 건너뛰기 — 하단 텍스트 링크 */}
         <button
-          data-testid="btn-start"
+          data-testid="btn-skip-onboarding"
           onClick={onSkip}
           className="text-sm text-gray-400 text-center underline underline-offset-2 mt-1 self-center"
         >

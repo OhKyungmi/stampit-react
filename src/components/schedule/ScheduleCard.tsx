@@ -131,7 +131,7 @@ export default function ScheduleCard({
             <span className="text-[12px] text-gray-400">{schedule.time}</span>
           )}
           {daysAgoLabel && (
-            <span className={`text-[11px] font-semibold ${daysAgoColor}`}>{daysAgoLabel}</span>
+            <span data-testid="date-elapsed" className={`text-[11px] font-semibold ${daysAgoColor}`}>{daysAgoLabel}</span>
           )}
           {/* 확정 뱃지 */}
           {schedule.isConfirmed && !isCancelled && (
@@ -139,7 +139,7 @@ export default function ScheduleCard({
           )}
           {/* 취소됨 뱃지 */}
           {isCancelled && (
-            <Badge color="gray">취소됨</Badge>
+            <span data-testid="badge-cancelled"><Badge color="gray">취소됨</Badge></span>
           )}
         </div>
 

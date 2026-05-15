@@ -96,7 +96,7 @@ export default function BottomSheet({
       <div
         className="fixed inset-0 bg-black/40 z-40 transition-opacity"
         onClick={onClose}
-        data-testid="bottom-sheet-backdrop"
+        data-testid="sheet-dim"
       />
 
       {/* 시트 — keyboardOffset 만큼 bottom 을 올림 */}
@@ -111,7 +111,7 @@ export default function BottomSheet({
       >
         {/* 핸들 */}
         <div className="flex justify-center pt-3 pb-1 flex-shrink-0">
-          <div className="w-9 h-1 rounded-full bg-gray-200" />
+          <div data-testid="sheet-handle" className="w-9 h-1 rounded-full bg-gray-200" />
         </div>
 
         {/* 헤더 */}
@@ -120,6 +120,7 @@ export default function BottomSheet({
             {title}
           </h2>
           <button
+            data-testid="btn-close-sheet"
             onClick={onClose}
             className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
             aria-label="닫기"

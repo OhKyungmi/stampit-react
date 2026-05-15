@@ -12,6 +12,7 @@ interface BottomNavProps {
 export default function BottomNav({ activeTab, onTabChange, statusBadge = 0 }: BottomNavProps) {
   return (
     <nav
+      data-testid="bottom-nav"
       className="fixed bottom-0 left-0 right-0 z-20 bg-white border-t border-gray-100"
       style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >
@@ -23,7 +24,7 @@ export default function BottomNav({ activeTab, onTabChange, statusBadge = 0 }: B
           onClick={() => onTabChange('planner')}
           className="flex-1 flex flex-col items-center justify-center gap-1 active:opacity-60"
         >
-          <div className={activeTab === 'planner' ? 'bg-indigo-50 rounded-[14px] px-[18px] py-1' : 'py-1 px-[18px]'}>
+          <div data-testid="nav-icon-planner" className={activeTab === 'planner' ? 'bg-indigo-50 rounded-[14px] px-[18px] py-1' : 'py-1 px-[18px]'}>
             <svg
               width={activeTab === 'planner' ? 22 : 24}
               height={activeTab === 'planner' ? 22 : 24}
@@ -72,7 +73,7 @@ export default function BottomNav({ activeTab, onTabChange, statusBadge = 0 }: B
               <circle cx="19" cy="19" r="2"/>
             </svg>
             {statusBadge > 0 && (
-              <span className="absolute -top-1 -right-1 min-w-[18px] min-h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-[3px] py-[1px] leading-none border-2 border-white">
+              <span data-testid="nav-badge-status" className="absolute -top-1 -right-1 min-w-[18px] min-h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-[3px] py-[1px] leading-none border-2 border-white">
                 {statusBadge > 99 ? '99+' : statusBadge}
               </span>
             )}

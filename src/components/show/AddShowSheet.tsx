@@ -119,6 +119,7 @@ export default function AddShowSheet({ isOpen, onClose, onSubmit, mode = 'add', 
     <BottomSheet
       isOpen={isOpen}
       onClose={onClose}
+      testId="add-show-sheet"
       title={mode === 'edit' ? '공연 수정' : '공연 추가'}
       footer={
         <Button
@@ -138,6 +139,7 @@ export default function AddShowSheet({ isOpen, onClose, onSubmit, mode = 'add', 
           {headerImageUrl ? (
             <div className="relative rounded-xl overflow-hidden">
               <img
+                data-testid="header-image-preview"
                 src={headerImageUrl}
                 alt="공연 상단 이미지"
                 className="w-full h-32 object-cover"

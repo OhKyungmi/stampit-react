@@ -66,6 +66,7 @@ export default function ShowTabBar({
       {/* 공연 탭 스크롤 영역 */}
       <div
         ref={tabContainerRef}
+        data-testid="show-tab-bar"
         className="flex-1 flex items-center gap-1.5 overflow-x-auto no-scrollbar"
       >
         {visibleShows.map(show => {

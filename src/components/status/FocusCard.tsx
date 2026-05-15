@@ -48,6 +48,7 @@ export default function FocusCard({ boards, onScrollToBoard, onAddBoard }: Focus
     return (
       <button
         type="button"
+        data-testid="focus-card"
         onClick={() => onScrollToBoard(info.boardId)}
         className="w-full bg-indigo-600 rounded-2xl p-4 shadow-sm text-left active:bg-indigo-700 transition-colors"
       >

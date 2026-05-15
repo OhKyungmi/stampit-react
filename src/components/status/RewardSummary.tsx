@@ -97,7 +97,7 @@ export default function RewardSummary({ showId, boards }: RewardSummaryProps) {
 
   return (
     <>
-      <div className="space-y-3" data-testid="reward-summary">
+      <div className="space-y-3" data-testid="benefit-section">
         {activeBoards.map(board => {
           const sorted = [...board.benefits].sort((a, b) => a.requiredStamps - b.requiredStamps);
           if (sorted.length === 0) return null;
@@ -132,7 +132,7 @@ export default function RewardSummary({ showId, boards }: RewardSummaryProps) {
                       key={benefit.id}
                       data-benefit-id={benefit.id}
                       className={rowClass}
-                      data-testid={`benefit-item-${benefit.id}`}
+                      data-testid={`benefit-row-${benefit.id}`}
                     >
                       {/* 상태 아이콘 */}
                       <div className={`w-5 h-5 rounded-full flex items-center justify-center text-xs shrink-0 mt-0.5 ${
@@ -145,7 +145,7 @@ export default function RewardSummary({ showId, boards }: RewardSummaryProps) {
 
                       {/* 텍스트 */}
                       <div className="flex-1 min-w-0">
-                        <p className={`text-sm ${
+                        <p data-testid="benefit-name" className={`text-sm ${
                           isUsed
                             ? 'line-through text-gray-400'
                             : isAchieved

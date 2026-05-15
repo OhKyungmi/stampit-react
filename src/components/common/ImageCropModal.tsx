@@ -162,7 +162,7 @@ export default function ImageCropModal({
   const hasCrop = cw > 0;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
+    <div data-testid="image-crop-modal" className="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
       <div className="bg-white rounded-2xl overflow-hidden w-full max-w-lg mx-4">
         <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
           <h2 className="text-base font-semibold text-gray-800">이미지 크롭</h2>
@@ -197,16 +197,17 @@ export default function ImageCropModal({
               >
                 {/* Rule-of-thirds guide lines */}
                 <div className="absolute inset-0 pointer-events-none">
-                  <div className="absolute inset-y-0 border-l border-white/35" style={{ left: '33.33%' }} />
-                  <div className="absolute inset-y-0 border-l border-white/35" style={{ left: '66.67%' }} />
-                  <div className="absolute inset-x-0 border-t border-white/35" style={{ top: '33.33%' }} />
-                  <div className="absolute inset-x-0 border-t border-white/35" style={{ top: '66.67%' }} />
+                  <div data-testid="crop-guide-line" className="absolute inset-y-0 border-l border-white/35" style={{ left: '33.33%' }} />
+                  <div data-testid="crop-guide-line" className="absolute inset-y-0 border-l border-white/35" style={{ left: '66.67%' }} />
+                  <div data-testid="crop-guide-line" className="absolute inset-x-0 border-t border-white/35" style={{ top: '33.33%' }} />
+                  <div data-testid="crop-guide-line" className="absolute inset-x-0 border-t border-white/35" style={{ top: '66.67%' }} />
                 </div>
 
                 {/* Corner handles */}
                 {(['nw', 'ne', 'sw', 'se'] as const).map(handle => (
                   <div
                     key={handle}
+                    data-testid="crop-handle"
                     className="absolute bg-white z-10"
                     style={{
                       width: HANDLE * 2,
@@ -228,6 +229,7 @@ export default function ImageCropModal({
         <div className="px-4 py-3 flex gap-3 justify-end border-t border-gray-100">
           <button
             type="button"
+            data-testid="btn-crop-cancel"
             onClick={onClose}
             className="px-4 py-2 rounded-xl text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 transition-colors"
           >

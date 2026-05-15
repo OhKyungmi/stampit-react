@@ -34,7 +34,7 @@ export default function ShowReportSheet({ isOpen, onClose, show }: ShowReportShe
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end">
+    <div data-testid="show-report-modal" className="fixed inset-0 z-50 flex items-end">
       {/* 딤 */}
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
 
@@ -158,6 +158,12 @@ export default function ShowReportSheet({ isOpen, onClose, show }: ShowReportShe
                       </p>
                       <p
                         className="leading-tight"
+                        data-testid={
+                          idx === 0 ? 'report-total-visits'
+                          : idx === 1 ? 'report-total-spent'
+                          : idx === 2 ? 'report-total-saved'
+                          : undefined
+                        }
                         style={{ fontSize: '26px', fontWeight: 700, color: cell.color }}
                       >
                         {cell.value}
@@ -203,7 +209,7 @@ export default function ShowReportSheet({ isOpen, onClose, show }: ShowReportShe
 
               {/* ── 함께한 캐스트 ── */}
               {report.topCasts.length > 0 && (
-                <div className="py-5 border-b" style={{ borderColor: '#F3F4F6' }}>
+                <div data-testid="report-cast-chart" className="py-5 border-b" style={{ borderColor: '#F3F4F6' }}>
                   <p
                     className="mb-3"
                     style={{ fontSize: '13px', fontWeight: 600, color: '#374151' }}
@@ -247,7 +253,7 @@ export default function ShowReportSheet({ isOpen, onClose, show }: ShowReportShe
 
               {/* ── 특별한 순간 ── */}
               {report.specialEventSummary.length > 0 && (
-                <div className="py-5">
+                <div data-testid="report-special-events" className="py-5">
                   <p
                     className="mb-3"
                     style={{ fontSize: '13px', fontWeight: 600, color: '#374151' }}
@@ -309,6 +315,7 @@ export default function ShowReportSheet({ isOpen, onClose, show }: ShowReportShe
             {saving ? '저장 중…' : '📷 이미지로 저장'}
           </button>
           <button
+            data-testid="btn-report-close"
             onClick={onClose}
             className="flex items-center justify-center font-semibold"
             style={{
