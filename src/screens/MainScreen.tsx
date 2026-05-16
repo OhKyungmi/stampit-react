@@ -21,7 +21,7 @@ interface MainScreenProps {
 
 /** 메인 화면 */
 export default function MainScreen({ shows }: MainScreenProps) {
-  const { addShow, updateShow, deleteShow, archiveShow, reorderShows } = useShowStore();
+  const { addShow, updateShow, deleteShow, archiveShow, reorderShows, recalcBenefits } = useShowStore();
   const { manageSheetOpen } = useStorageAlertStore();
   const [activeShowId, setActiveShowId] = useState<string | null>(
     shows.filter(s => !s.isArchived)[0]?.id || null
@@ -41,6 +41,11 @@ export default function MainScreen({ shows }: MainScreenProps) {
         b => b.isAchieved && !b.isUsed && !isNoUseBenefit(b.description) && !isCouponBenefit(b.description)
       ).length
     : 0;
+
+  // 앱 실행 시 날짜가 도래한 예비 도장 혜택 재계산
+  useEffect(() => {
+    recalcBenefits();
+  }, []);
 
   // 공연이 추가되거나 활성 공연이 사라질 때 자동 선택
   useEffect(() => {

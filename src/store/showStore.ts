@@ -110,6 +110,7 @@ interface ShowStore {
   exportData: () => string;
   importData: (json: string) => boolean; // ✅ 수정: 성공/실패 boolean 반환
   resetAllData: () => void;
+  recalcBenefits: () => void; // 날짜 도래 시 예비 도장 혜택 재계산
 
   // 수동 도장 추가/삭제
   addManualStamp: (showId: string, boardId: string, data: { stampType: 'exchange' | 'share' | 'etc'; count: number; memo?: string; earnedAt: string }) => void;
@@ -804,10 +805,10 @@ export const useShowStore = create<ShowStore>((set, get) => {
               });
             }
             const updatedStamps = [...board.stamps, ...newStamps];
-            // 전체 도장 수 기준으로 혜택 달성 체크 (날짜 무관)
-            const totalCount = updatedStamps.length;
+            // 유효 도장 수 기준으로 혜택 달성 체크 (earnedAt <= today 인 도장만)
+            const effCount = effectiveStampCount(updatedStamps, today);
             const updatedBenefits = board.benefits.map(b => {
-              if (!b.isAchieved && b.requiredStamps <= totalCount) {
+              if (!b.isAchieved && b.requiredStamps <= effCount) {
                 return { ...b, isAchieved: true };
               }
               return b;
@@ -1096,6 +1097,34 @@ export const useShowStore = create<ShowStore>((set, get) => {
     resetAllData: () => {
       saveData([], []);
       set({ shows: [], schedules: [] });
+    },
+
+    // 앱 실행 시 호출 — 날짜가 도래한 예비 도장의 혜택을 실제 달성으로 전환
+    recalcBenefits: () => {
+      const today = todayKSTString();
+      set(state => {
+        let changed = false;
+        const shows = state.shows.map(show => {
+          const stampBoards = show.stampBoards.map(board => {
+            const effCount = effectiveStampCount(board.stamps, today);
+            const hasNew = board.benefits.some(b => !b.isAchieved && b.requiredStamps <= effCount);
+            if (!hasNew) return board;
+            changed = true;
+            return {
+              ...board,
+              benefits: board.benefits.map(b =>
+                !b.isAchieved && b.requiredStamps <= effCount
+                  ? { ...b, isAchieved: true }
+                  : b
+              ),
+            };
+          });
+          return { ...show, stampBoards };
+        });
+        if (!changed) return state;
+        saveData(shows, state.schedules);
+        return { shows };
+      });
     },
 
     // ===== 수동 도장 추가/삭제 =====
